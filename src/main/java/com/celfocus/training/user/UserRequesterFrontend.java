@@ -1,9 +1,9 @@
 package com.celfocus.training.user;
 
 import com.celfocus.training.Saver;
-import com.celfocus.training.Saver.ItemInfo;
-import com.celfocus.training.Saver.ShoppingCart;
-import com.celfocus.training.Saver.User;
+import com.celfocus.training.models.ItemInfoModel;
+import com.celfocus.training.models.ShoppingCartModel;
+import com.celfocus.training.models.UserModel;
 import com.celfocus.training.util.Utils;
 
 import java.text.SimpleDateFormat;
@@ -20,7 +20,7 @@ public class UserRequesterFrontend {
      * @param user usuario que será renderizado
      * @return o texto no formato solicitado com as informarções do user
      */
-    public String returnFrontendUser(String type, User user) {
+    public String returnFrontendUser(String type, UserModel user) {
         if (type.equals("html")) {
             return "<div>"
              + "<h1>User</h1>"
@@ -47,7 +47,7 @@ public class UserRequesterFrontend {
      * @param shoppingCart shoppingCart que será renderizado
      * @return o texto no formato solicitado com as informarções do shoppingCart
      */
-    public String returnFrontendShoppingCart(String type, ShoppingCart shoppingCart) {
+    public String returnFrontendShoppingCart(String type, ShoppingCartModel shoppingCart) {
         if (type.equals("html")) {
             return "<div>"
              + "<h1>ShoppingCart</h1>"
@@ -72,7 +72,7 @@ public class UserRequesterFrontend {
      * @param item item que será renderizado
      * @return o texto no formato solicitado com as informarções do item
      */
-    public String returnFrontendItem(String type, ItemInfo item) {
+    public String returnFrontendItem(String type, ItemInfoModel item) {
         if (type.equals("html")) {
             return "<div>"
              + "<h1>Item</h1>"
@@ -106,7 +106,7 @@ public class UserRequesterFrontend {
             isAdult = "false";
         }
 
-        saver.createOrUpdateUser(name, Utils.toDate(birthdayDate, new SimpleDateFormat("dd/mm/yyyy")), isAdult.equals("true") ? true : false);
+        saver.createOrUpdateUser(name, Utils.toDate(birthdayDate, new SimpleDateFormat("dd/mm/yyyy")), isAdult.equals("true"));
     }
 
     /**

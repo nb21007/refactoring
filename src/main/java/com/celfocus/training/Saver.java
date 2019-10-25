@@ -1,66 +1,42 @@
 
 package com.celfocus.training;
 
+import com.celfocus.training.models.ItemInfoModel;
+import com.celfocus.training.models.ShoppingCartItemModel;
+import com.celfocus.training.models.ShoppingCartModel;
+import com.celfocus.training.models.UserModel;
+
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
 /**
- * Temos 4 entidades em nosso projeto User, ShoppingCart, ShoppingCartItem e ItemInfo
+ * Temos 4 entidades em nosso projeto User, ShoppingCart, ShoppingCartItemModel e ItemInfo
  */
 public class Saver {
 
-    private static final List<User> users = new ArrayList<>();
-    private static final List<ShoppingCart> shoppingCarts = new ArrayList<>();
-    private static final List<ItemInfo> items = new ArrayList<>();
+    private static final List<UserModel> users = new ArrayList<>();
+    private static final List<ShoppingCartModel> shoppingCarts = new ArrayList<>();
+    private static final List<ItemInfoModel> items = new ArrayList<>();
 
-    public static class User {
-        
-        public String userName;
-        public Date birthdayDate;
-        public boolean isAdult;
+    public UserModel createOrUpdateUser(String name, Date birthdayDate, boolean isAdult) {
 
-    }
-
-    public static class ShoppingCart {
-        
-        public User user;
-        public List<ShoppingCartItem> items;
-    }
-
-    public static class ShoppingCartItem {
-
-        public ItemInfo item;
-        public int quantity;
-        public double discount;
-
-    }
-
-    public static class ItemInfo {
-
-        public String name;
-        public double value;
-
-    }
-
-    public User createOrUpdateUser(String name, Date birthdayDate, boolean isAdult) {
-
-        User user = UserExists(name) ? updateUser(name, birthdayDate, isAdult) : createUser(name, birthdayDate, isAdult);
+        UserModel user = UserExists(name) ? updateUser(name, birthdayDate, isAdult) : createUser(name, birthdayDate, isAdult);
 
         return user;
 
     }
 
-    private User updateUser(String name, Date birthdayDate, boolean isAdult) {
+    private UserModel updateUser(String name, Date birthdayDate, boolean isAdult) {
 
-        User user = getUser(name);
+        UserModel user = getUser(name);
         setUserDetails(name, birthdayDate, isAdult, user);
         users.add(user);
 
         boolean hasShoppingCart = getUserShoppingCart(user) != null;
 
         if (!hasShoppingCart){
-            ShoppingCart shoppingCart = new ShoppingCart();
+            ShoppingCartModel shoppingCart = new ShoppingCartModel();
             shoppingCart.user = user;
             shoppingCarts.add(shoppingCart);
         }
@@ -68,11 +44,11 @@ public class Saver {
         return user;
     }
 
-    private ShoppingCart getUserShoppingCart(User user) {
+    private ShoppingCartModel getUserShoppingCart(UserModel user) {
 
-        ShoppingCart userShoppingCart = null;
+        ShoppingCartModel userShoppingCart = null;
 
-        for (ShoppingCart shoppingCart : shoppingCarts) {
+        for (ShoppingCartModel shoppingCart : shoppingCarts) {
             if (shoppingCart.user == user) {
                 userShoppingCart = shoppingCart;
                 break;
@@ -81,35 +57,36 @@ public class Saver {
         return userShoppingCart;
     }
 
-    private User createUser(String name, Date birthdayDate, boolean isAdult) {
+    private UserModel createUser(String name, Date birthdayDate, boolean isAdult) {
 
-        User user = new User();
+        UserModel user = new UserModel();
         setUserDetails(name, birthdayDate, isAdult, user);
         users.add(user);
 
-        ShoppingCart shoppingCart = new ShoppingCart();
-        shoppingCart.user = user;
-        shoppingCart.items = new ArrayList<>();
+        ShoppingCartModel shoppingCart = new ShoppingCartModel();
+        List<ShoppingCartItemModel> items = shoppingCart.getItems();
+        shoppingCart.setUser(user);
+        items = new ArrayList<>();
         shoppingCarts.add(shoppingCart);
 
         return user;
     }
 
-    private void setUserDetails(String name, Date birthdayDate, boolean isAdult, User user) {
-        user.birthdayDate = birthdayDate;
-        user.userName = name;
-        user.isAdult = isAdult;
+    private void setUserDetails(String name, Date birthdayDate, boolean isAdult, UserModel user) {
+        user.setBirthdayDate(birthdayDate);
+        user.setUserName(name);
+        user.setAdult(isAdult);
     }
 
     private boolean UserExists(String name) {
-        User userFound = getUser(name);
+        UserModel userFound = getUser(name);
         return userFound != null;
     }
 
-    private User getUser(String name) {
-        User userFound = null;
-        for (User user : users) {
-            if (user.userName.equals(name)) {
+    private UserModel getUser(String name) {
+        UserModel userFound = null;
+        for (UserModel user : users) {
+            if (user.getUserName().equals(name)) {
                 userFound = user;
                 break;
             }
@@ -120,7 +97,7 @@ public class Saver {
 
     public void deleteUser(String name) {
 
-        User userFound = getUser(name);
+        UserModel userFound = getUser(name);
         if (userFound != null) {
             users.remove(userFound);
         }
@@ -128,73 +105,76 @@ public class Saver {
 
     public void addItemToUser(String name, String itemName, int quantity) {
 
-        User user = getUser(name);
+        UserModel user = getUser(name);
         
         if (user != null) {
-            ShoppingCart ShoppingCart = getUserShoppingCart(user);
+            ShoppingCartModel ShoppingCart = getUserShoppingCart(user);
 
             if (ShoppingCart != null) {
-                ShoppingCartItem shoppingCartItem = getShoppingCartItem(itemName, ShoppingCart);
-                updateShoppingCart(itemName, quantity, user, shoppingCartItem);
+                ShoppingCartItemModel shoppingCartItemModel = getShoppingCartItem(itemName, ShoppingCart);
+                updateShoppingCart(itemName, quantity, user, shoppingCartItemModel);
             }
         }
     }
 
-    private void updateShoppingCart(String itemName, int quantity, User user, ShoppingCartItem shoppingCartItem) {
+    private void updateShoppingCart(String itemName, int quantity, UserModel user, ShoppingCartItemModel shoppingCartItemModel) {
 
-        if (shoppingCartItem != null) {
-            updateShoppingCartItemQuantity(quantity, shoppingCartItem);
+        if (shoppingCartItemModel != null) {
+            updateShoppingCartItemQuantity(quantity, shoppingCartItemModel);
         } else {
             updateShoppingCartItem(itemName, quantity, user);
         }
     }
 
-    private void updateShoppingCartItem(String itemName, int quantity, User user) {
-        ItemInfo itemInfo = getItemInfo(itemName);
+    private void updateShoppingCartItem(String itemName, int quantity, UserModel user) {
+        ItemInfoModel itemInfo = getItemInfo(itemName);
 
         if (itemInfo != null) {
-            ShoppingCartItem shoppingCartItem = new ShoppingCartItem();
-            shoppingCartItem.item = itemInfo;
-            shoppingCartItem.quantity = quantity;
+            ShoppingCartItemModel shoppingCartItemModel = new ShoppingCartItemModel();
+            shoppingCartItemModel.setItem(itemInfo;
+            shoppingCartItemModel.setQuantity(quantity);
 
-            validateUserDiscount(user, shoppingCartItem);
+            validateUserDiscount(user, shoppingCartItemModel);
         }
     }
 
-    private ItemInfo getItemInfo(String itemName) {
-        ItemInfo itemInfo = null;
-        for (ItemInfo item : items) {
-            if (item.name.equals(itemName)) {
+    private ItemInfoModel getItemInfo(String itemName) {
+        ItemInfoModel itemInfo = null;
+        for (ItemInfoModel item : items) {
+            if (item.getName().equals(itemName)) {
                 itemInfo = item;
             }
         }
         return itemInfo;
     }
 
-    private void validateUserDiscount(User user, ShoppingCartItem shoppingCartItem1) {
-        if (user.isAdult){
-            shoppingCartItem1.discount = 0.1;
+    private void validateUserDiscount(UserModel user, ShoppingCartItemModel shoppingCartItemModel) {
+        if (user.isAdult()){
+            shoppingCartItemModel.setDiscount(0.1);;
             if ((getUserAge(user) < 80)){
-                shoppingCartItem1.discount = 0.2;
+                shoppingCartItemModel.setDiscount(0.2);
             }
         }
     }
 
-    private int getUserAge(User user) {
+    private int getUserAge(UserModel user) {
         return new Date().getYear() - user.birthdayDate.getYear();
     }
 
-    private void updateShoppingCartItemQuantity(int quantity, ShoppingCartItem shoppingCartInfo) {
-        shoppingCartInfo.quantity += quantity;
+    private void updateShoppingCartItemQuantity(int quantity, ShoppingCartItemModel shoppingCartInfo) {
+        int newQuantity = 0;
+        newQuantity += quantity;
+        shoppingCartInfo.setQuantity(newQuantity);;
     }
 
-    private ShoppingCartItem getShoppingCartItem(String nameItem, ShoppingCart shoppingCart) {
-        ShoppingCartItem shoppingCartItemData = null;
-        for (ShoppingCartItem shoppingCartItem : shoppingCart.items) {
-            if (shoppingCartItem.item.name == nameItem) {
-                shoppingCartItemData = shoppingCartItem;
+    private ShoppingCartItemModel getShoppingCartItem(String nameItem, ShoppingCartModel shoppingCart) {
+        ShoppingCartItemModel shoppingCartItemModelData = null;
+        for (ShoppingCartItemModel shoppingCartItemModel : shoppingCart.getItems()) {
+            String shoppingCartItemName = shoppingCartItemModel.getItem().getName();
+            if (shoppingCartItemModel.getItem().getName() == nameItem) {
+                shoppingCartItemModelData = shoppingCartItemModel;
             }
         }
-        return shoppingCartItemData;
+        return shoppingCartItemModelData;
     }
 } 
