@@ -1,6 +1,7 @@
 package com.celfocus.training.user;
 
 import com.celfocus.training.Saver;
+import com.celfocus.training.controllers.UserController;
 import com.celfocus.training.models.ItemInfoModel;
 import com.celfocus.training.models.ShoppingCartModel;
 import com.celfocus.training.models.UserModel;
@@ -24,16 +25,16 @@ public class UserRequesterFrontend {
         if (type.equals("html")) {
             return "<div>"
              + "<h1>User</h1>"
-             + "<span>" + user.userName + "</span>"
-             + "<span>" + user.birthdayDate + "</span>"
-             + "<span>" + user.isAdult + "</span>"
+             + "<span>" + user.getUserName() + "</span>"
+             + "<span>" + user.getBirthdayDate() + "</span>"
+             + "<span>" + user.isAdult() + "</span>"
              + "</div>";
         } else {
             if (type.equals("xml")) {
                 return "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\" ?>"
-                    + "<name> " + user.userName + "</name>"
-                    + "<bd>" + user.birthdayDate + "</bd>"
-                    + "<older> " + user.isAdult + "</older>";
+                    + "<name> " + user.getUserName() + "</name>"
+                    + "<bd>" + user.getBirthdayDate() + "</bd>"
+                    + "<older> " + user.isAdult() + "</older>";
             } else {
                 //do nothing
                 return "";
@@ -51,14 +52,14 @@ public class UserRequesterFrontend {
         if (type.equals("html")) {
             return "<div>"
              + "<h1>ShoppingCart</h1>"
-             + "<span> " + shoppingCart.user + "</span>"
-             + "<span> " + shoppingCart.items + "</span>"
+             + "<span> " + shoppingCart.getUser() + "</span>"
+             + "<span> " + shoppingCart.getUser() + "</span>"
              + "</div>";
         } else {
             if (type.equals("xml")) {
                 return "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\" ?>"
-                    + "<user> " + shoppingCart.user + "</user>"
-                    + "<itens> " + shoppingCart.items + "</itens>";
+                    + "<user> " + shoppingCart.getUser() + "</user>"
+                    + "<itens> " + shoppingCart.getItems() + "</itens>";
             } else {
                 //do nothing
                 return "";
@@ -76,13 +77,13 @@ public class UserRequesterFrontend {
         if (type.equals("html")) {
             return "<div>"
              + "<h1>Item</h1>"
-             + "<span> " + item.name + "</span>"
-             + "<span> " + item.value + "</span>"
+             + "<span> " + item.getName() + "</span>"
+             + "<span> " + item.getValue() + "</span>"
              + "</div>";
         } else {
             if (type.equals("xml")) {
-                return "<name> " + item.name + "</name>"
-                    + "<valor> " + item.value + "</valor>";
+                return "<name> " + item.getName() + "</name>"
+                    + "<valor> " + item.getValue() + "</valor>";
             } else {
                 //do nothing
                 return "";
@@ -113,8 +114,8 @@ public class UserRequesterFrontend {
      * Remover Usuario
      */
     public void deleteUser(String name) {
-        Saver saver = new Saver();
-        saver.deleteUser(name);
+        UserController userController = new UserController();
+        userController.deleteUser(name);
     }
 
     /**
